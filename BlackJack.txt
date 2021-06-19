@@ -1,0 +1,372 @@
+import random
+
+desk = {"A spades": 11, "K spades": 10, "Q spades": 10, "J spades": 10, "10 spades": 10, "9 spades": 9, "8 spades": 8,
+        "7 spades": 7, "6 spades": 6, "5 spades": 5, "4 spades": 4,
+        "3 spades": 3, "2 spades": 2, "A hearts": 11, "K hearts": 10, "Q hearts": 10, "J hearts": 10, "10 hearts": 10,
+        "9 hearts": 9, "8 hearts": 8, "7 hearts": 7, "6 hearts": 6,
+        "5 hearts": 5, "4 hearts": 4, "3 hearts": 3, "2 hearts": 2, "A diamonds": 11, "K diamonds": 10,
+        "Q diamonds": 10, "J diamonds": 10, "10 diamonds": 10, "9 diamonds": 9, "8 diamonds": 8,
+        "7 diamonds": 7, "6 diamonds": 6, "5 diamonds": 5, "4 diamonds": 4, "3 diamonds": 3, "2 diamonds": 2,
+        "A clubs": 11, "K clubs": 10, "Q clubs": 10, "J clubs": 10, "10 clubs": 10,
+        "9 clubs": 9, "8 clubs": 8, "7 clubs": 7, "6 clubs": 6, "5 clubs": 5, "4 clubs": 4, "3 clubs": 3, "2 clubs": 2}
+casino_name = None
+person = []
+player_nums = None
+
+
+# CASINO CLASSES
+
+class Casino():
+    def __init__(self):
+        pass
+
+
+class Yozgat(Casino):
+    starting_budget = 100
+    min_beth = 5
+    name = "Las Yozgat Hotel"
+    number_of_desk = 4
+
+    def __init__(self):
+        global desk
+        Casino.__init__(self)
+        self.desk = desk * 4
+
+
+class Cankiri(Casino):
+    starting_budget = 500
+    min_beth = 25
+    number_of_desk = 4
+    name = "Cankiri Grand Casino"
+
+    def __init__(self):
+        global desk
+        Casino.__init__(self)
+        self.desk = desk * 4
+
+
+class Corum(Casino):
+    starting_budget = 10000
+    min_beth = 100
+    number_of_desk = 6
+    name = "Casino de Corum"
+
+    def __init__(self):
+        global desk
+        Casino.__init__(self)
+        self.desk = desk * 6
+
+
+# PLAYERS AND DEALER CLASSES
+
+class Hands(object):
+    sum_of_cards = 0
+
+    def __init__(self):
+        self.num_of_cards = 0
+        self.cards = []
+        self.sum_of_cards = 0
+
+    def give_card(self):
+        """Gives a card"""
+        self.num_of_cards += 1
+        self.cards.append(random.choice(list(desk.keys())))
+        self.sum_of_cards += desk[self.cards[self.num_of_cards - 1]]
+
+
+class Dealer(Hands):
+    def __init__(self):
+        Hands.__init__(self)
+
+    def sum_check(self):
+        """Checks the sum of the cards whether it is greater than 16 or not"""
+        return self.sum_of_cards < 17
+
+    def first_show_card(self):
+        print("Dealer's Hand:")
+        print(self.cards[0] + ", X")
+
+    def print_hand(self):
+        print("Dealer's Hand:")
+        print(self.cards)
+
+
+class Player(Hands):
+
+    def __init__(self, num, name):
+        Hands.__init__(self)
+        self.name = name
+        self.num = num
+        self.budget = casino_name.starting_budget
+        self.beth = 0
+
+    def print_hand(self):
+        print(self.name + "'s Hand:")
+        print(self.cards)
+
+    def hit(self):
+        """Gives a card to the player"""
+        self.give_card()
+
+    def stand(self):
+        """Skip that player"""
+        return False
+
+    def split(self):
+        """Splits cards and gives 2 new cards"""
+        pass
+
+    def double(self):
+        """Doubles the beth and gives ONLY one card"""
+        self.beth = self.beth * 2
+        self.give_card()
+        self.stand()
+
+    def take_insurance(self):
+        """If dealer has a blackjake gives the half of the beth"""
+        pass
+
+    def add_money(self, money):
+        """Adds money to the budget"""
+        self.budget += money
+
+    def remove_money(self, money):
+        """Removes money from the budget"""
+        self.budget -= money
+
+    def blackjack(self):
+        self.add_money(self.beth * 3 / 2)
+        print(self.name + " BLACKJACK!")
+
+    def win(self):
+        self.add_money(self.beth)
+        print(self.name + " Wins!")
+
+    def lose(self):
+        self.remove_money(self.beth)
+        print(self.name + " Loses!")
+
+    def tie(self):
+        print("It is a tie for " + self.name)
+
+    def set_beth(self, beth):
+        self.beth += beth
+
+    def del_beth(self):
+        self.beth = 0
+
+    def beth_check(self, beth):
+        return casino_name.min_beth < beth < self.budget
+
+    def __del__(self):
+        print(self.name + " left!")
+
+    def ask_player(self):
+        print(self.name + "'s turn!")
+        if dealer.cards[0] == "A spades" or dealer.cards[0] == "A hearts" or dealer.cards[0] == "A diamonds" or \
+                dealer.cards[0] == "A clubs":
+            while True:
+                insurance_choice = input("Take insurance? Y or N")
+                if insurance_choice == 'Y':
+                    self.take_insurance()
+                    break
+                elif insurance_choice == 'N':
+                    break
+                else:
+                    print("Please write Y for yes and N for no.")
+                    continue
+        print("S:Stand")
+        print("H:Hit")
+        print("D:Double")
+
+        while True:
+            game_choice = input("Enter your choice: ")
+            if game_choice == "S":
+                return self.stand()
+                break
+            elif game_choice == "H":
+                self.hit()
+                break
+            elif game_choice == "D":
+                self.double()
+                break
+            else:
+                print("Please enter S, H, or D")
+                continue
+
+
+# STARTING
+def choosing_casino():
+    print(
+        "Good evening Sir or Madam! Please select one of our famous casinos. Please enter the letter which is refer your select to the space.")
+    print("A:Las Yozgat Hotel \n  Minimum beth: $5\n  Number of desks: 4 \n  We will give you $100 for opening.")
+    print("B:Cankiri Grand Casino \n  Minimum beth: $25 \n  Number of desks: 4 \n  We will give you $500 for opening.")
+    print("C:Casino de Corum \n  Minimum beth: $100\n  Number of desks: 6 \n  We will give you $10000 for opening.")
+    global casino_name
+    while True:
+        casino_choice = input()
+        if casino_choice == "A":
+            casino_name = Yozgat
+            break
+        elif casino_choice == "B":
+            casino_name = Cankiri
+            break
+        elif casino_choice == "C":
+            casino_name = Corum
+            break
+        else:
+            print("You gave an incorrect letter. Please try it again.")
+            continue
+
+
+dealer = Dealer()
+
+
+# CREATING PLAYERS
+def create_player():
+    global player_nums
+    print("Welcome to our casino. While we are preparing your whiskies, please enter your names.")
+    while True:
+        try:
+            x = int(input("Please give the number of the players(1 to 7): "))
+        except:
+            print("Please give the number as an integer.")
+            continue
+        else:
+            if x in range(1, 8):
+                player_nums = range(1, x + 1)
+                break
+            else:
+                print("Please give a number between 1 and 7.")
+                continue
+    i = 1
+    while i < len(player_nums) + 1:
+        global person
+        name = input("Please enter the name of player %s: " % i)
+        person.append(Player(i, name))
+        i += 1
+
+        # PREPARING GAME
+
+
+def round_game():
+    global person
+    global player_nums
+    for j in player_nums:
+        while True:
+            try:
+                beth = int(input("Please enter your beth, " + person[j - 1].name))
+            except:
+                print("Please assume that you enter your beth.")
+                continue
+            else:
+                if person[j - 1].beth_check(beth):
+                    person[j - 1].set_beth(beth)
+                    break
+                else:
+                    print("Please give a beth greater than minimum beth and smaller than your budget.")
+                    continue
+
+    dealer.give_card()
+    dealer.give_card()
+    dealer.first_show_card()
+
+    for h in player_nums:
+        person[h - 1].give_card()
+        person[h - 1].give_card()
+        person[h - 1].print_hand()
+
+    for a in player_nums:
+        while True:
+            if person[a - 1].sum_of_cards < 21:
+                if person[a - 1].ask_player() == False:
+                    break
+                else:
+                    person[a - 1].print_hand()
+                    continue
+            else:
+                break
+
+    while True:
+        if dealer.sum_check():
+            dealer.give_card()
+            dealer.print_hand()
+            continue
+        else:
+            dealer.print_hand()
+            break
+
+    for b in player_nums:
+        if (dealer.sum_of_cards) < 21:
+            if (person[b - 1].sum_of_cards) > 21 or (dealer.sum_of_cards) > (person[b - 1].sum_of_cards):
+                person[b - 1].lose()
+            elif (person[b - 1].sum_of_cards) == 21 and (person[b - 1].num_of_cards == 2):
+                person[b - 1].blackjack()
+            elif (person[b - 1].sum_of_cards) == 21 and (person[b - 1].num_of_cards != 2):
+                person[b - 1].win()
+            elif dealer.sum_of_cards < person[b - 1].sum_of_cards and person[b - 1].sum_of_cards < 21:
+                person[b - 1].win()
+            elif dealer.sum_of_cards == person[b-1].sum_of_cards:
+                person[b-1].tie()
+        elif dealer.sum_of_cards == 21:
+            if person[b - 1].sum_of_cards > 21 or (dealer.sum_of_cards) > (person[b - 1].sum_of_cards):
+                person[b - 1].lose()
+            elif person[b - 1].sum_of_cards == 21:
+                person[b - 1].tie()
+        else:
+            if (person[b - 1].sum_of_cards) < 21:
+                person[b - 1].win()
+            elif (person[b - 1].sum_of_cards) > 21:
+                person[b - 1].tie()
+            elif (person[b - 1].sum_of_cards) == 21 and person[b - 1].num_of_cards == 2:
+                person[b - 1].blackjack()
+            elif (person[b - 1].sum_of_cards == 21) and person[b - 1].num_of_cards != 2:
+                person[b - 1].win()
+
+        print("Certain money balance is:")
+        print(person[b - 1].name + ":")
+        print(person[b - 1].budget)
+        person[b - 1].del_beth()
+
+    for c in player_nums:
+        while True:
+            quit = input("Do you want to quit(Y or N" + person[c - 1].name)
+            if quit == 'Y':
+                del person[c - 1]
+                player_nums.remove(c)
+                break
+            elif quit == 'N':
+                person[c - 1].sum_of_cards = 0
+                person[c - 1].num_of_cards = 0
+                person[c - 1].cards = []
+                break
+            else:
+                print("Please enter Y for yes and N for no.")
+                continue
+        dealer.sum_of_cards = 0
+        dealer.num_of_cards = 0
+        dealer.cards = []
+
+
+def reset_game():
+    global person
+    global player_nums
+    for d in player_nums:
+        del person[d - 1]
+        game_on()
+
+
+# GAME ON
+def game_on():
+    choosing_casino()
+    global player_nums
+    create_player()
+    while len(player_nums) > 0:
+        round_game()
+    if len(player_nums) == 0:
+        reset_game()
+
+
+game_on()
+
+# END OF THE GAME
