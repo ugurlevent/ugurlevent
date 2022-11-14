@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @ugurlevent
 - 👀 I’m interested in Aerodynamics and Computational Fluid Dynamics (CFD)
-- 🌱 I’m currently learning High Performance Computing (HPC)
+- 🌱 I’m currently learning Data Science and Machine Learning
 - 📫 How to reach me levent.ugur@metu.edu.tr or ugurlevent27@google.com
 
 <!---
